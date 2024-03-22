@@ -1,3 +1,4 @@
+from tkinter import *
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
@@ -5,61 +6,31 @@ import pyodbc
 from tkcalendar import DateEntry
 import datetime
 
+global id_login
+
+id_login = 1
 
 
-class FilmesApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Registro de Audiovisual Assistidos")
+root = Tk()
 
-        # Criando os elementos da interface
-        label_nome_filme = tk.Label(root, text="Nome do que foi assistido:")
-        label_nome_filme.grid(row=0, column=0, padx=10, pady=(40, 5), sticky="w")
-        self.entry_nome_filme = tk.Entry(root)
-        self.entry_nome_filme.grid(row=0, column=1, padx=10, pady=(40, 5), sticky="ew")
+class Limps():
+    def limpa_campos(self):
+        self.nomeprod.delete(0, END)
+        self.combo_genero.delete(0, END)
+        self.combo_tipo.delete(0, END)
+        self.codigo.delete(0, END)
+        self.datassis.delete(0, END)
 
 
-        label_genero = tk.Label(root, text="Gênero:")
-        label_genero.grid(row=2, column=0, padx=10, pady=5, sticky="w")
-        generos = ["Ação", "Comédia", "Drama", "Romance", "Ficção Científica", "Terror","Documentário","Espionagem","Fantasia","Filme de guerra","Musical","Filme policial"]
-        self.combo_genero = ttk.Combobox(root, values=generos)
-        self.combo_genero.grid(row=2, column=1, padx=10, pady=5, sticky="ew")
-
-        label_producao_av = tk.Label(root, text="Tipo  de producao: ")
-        label_producao_av.grid(row=3, column=0, padx=10, pady=5, sticky="w")
-        tipo_producao = ["Filme", "Série", "Documentário","Animação"]
-        self.combo_audio_visual = ttk.Combobox(root, values=tipo_producao)
-        self.combo_audio_visual.grid(row=3, column=1, padx=10, pady=5, sticky="ew")
-
-        label_data_assistido = tk.Label(root, text="Assistido em:")
-        label_data_assistido.grid(row=4, column=0, padx=10, pady=5, sticky="w")
-        self.cal_data_assistido = DateEntry(root, width=12, background='darkblue', foreground='white', borderwidth=2)
-        self.cal_data_assistido.grid(row=4, column=1, padx=10, pady=5, sticky="ew")
-
-        # Botão para salvar o filme
-        button_salvar = tk.Button(root, text="Salvar Filme", command=self.salvar_filme)
-        button_salvar.grid(row=5, column=0, columnspan=2, padx=10, pady=(18, 8), sticky="we")
-
-        button_consultar = tk.Button(root, text="Consultar Filmes", command=self.consultar_filmes)
-        button_consultar.grid(row=6, column=0, columnspan=2, padx=10, pady=(18, 8), sticky="we")
-
-        # Configurando o redimensionamento dinâmico dos elementos
-        root.grid_rowconfigure(5, weight=1)
-        root.grid_columnconfigure(0, weight=1)
-        root.grid_columnconfigure(1, weight=1)
-
-    def salvar_filme(self):
-        nome_assis = self.entry_nome_filme.get()
+    def salvar_audiovisual(self):
+        nome_assis = self.nomeprod.get()
         genero = self.combo_genero.get()
-        data_assistido = self.cal_data_assistido.get()
-        producao = self.combo_audio_visual.get()
-
-        confirmacao = messagebox.askyesno("Confirmação", f"Por favor, confirme os dados:\n\n"
-                                                         f"Nome do que foi assistido: {nome_assis}\n"
-                                                         f"Tipo  de producao: {producao}\n\n"
-                                                         f"Gênero: {genero}\n"
-                                                         f"Data Assistido: {data_assistido}\n"
-                                                         f"Os dados estão corretos?")
+        data_assistido = self.datassis.get()
+        producao = self.combo_tipo.get()
+    
+        
+        
+        confirmacao = messagebox.askyesno("Confirmação", "Os dados estão corretos?")
         if confirmacao:
             conn = pyodbc.connect('DRIVER={SQL Server};'
                                   'SERVER=DTI-NBRPE07DXG9\SQLEXPRESS;'
@@ -74,66 +45,213 @@ class FilmesApp:
 
             conn.commit()
             conn.close()
-            messagebox.showinfo("Filme Assistido", "Filme assistido foi armazenado com sucesso!")
-            self.proximo_filme()
+            messagebox.showinfo("Audiovisual Assistido", "Armazenado com sucesso!")
+            self.realizar_consulta()
+            self.limpa_campos()
 
 
-    def proximo_filme(self):
-        proximo = messagebox.askyesno("Inserir Novo Filme", "Deseja inserir outro filme?")
+    def proximo_audiovisual(self):
+        proximo = messagebox.askyesno("Inserir Novo Audiovisual", "Deseja inserir outro filme?")
         if proximo:
-            # Limpa os campos para inserção de um novo filme
-            self.entry_nome_filme.delete(0, tk.END)
-            self.entry_ano_estreia.delete(0, tk.END)
-            self.combo_genero.set('')
-            self.combo_audio_visual.set('')
-            self.cal_data_assistido.set_date(None)
+            # Limpa os campos para inserção de um novo audiovisual
+          self.nomeprod.delete(0, END)
+          self.combo_genero.delete(0, END)
+          self.combo_tipo.delete(0, END)
+          self.datassis.delete(0, END)
         else:
-            self.root.destroy()
+          self.limpa_campos()
 
 
-    def consultar_filmes(self):
-        consulta_window = ConsultaFilmesApp(self.root)
+    def alterar_audiovisual(self):
+        nome_assis = self.nomeprod.get()
+        genero = self.combo_genero.get()
+        data_assistido = self.datassis.get()
+        producao = self.combo_tipo.get()
+        codigoum = self.codigo.get()
+    
+        
+        
+        confirmacao = messagebox.askyesno("Confirmação", "Deseja realmente alterar?")
+        if confirmacao:
+            conn = pyodbc.connect('DRIVER={SQL Server};'
+                                  'SERVER=DTI-NBRPE07DXG9\SQLEXPRESS;'
+                                  'DATABASE=audiovisual1;'
+                                  'Trusted_Connection=yes;')
+            cursor = conn.cursor()
+
+        # Insere o registro do filme assistido na tabela correspondente
+            cursor.execute("update audiovisual set nomeaudivisual = ?, nome_tipoproduc = ?, nome_gen = ?, data_assis = ? where id_audvis = ?",
+                       (nome_assis, producao, genero, data_assistido, codigoum))
+            
+
+            conn.commit()
+            conn.close()
+            messagebox.showinfo("Audiovisual Assistido", "Alterado com sucesso!")
+            self.realizar_consulta()
+            self.limpa_campos()
 
 
-class ConsultaFilmesApp:
-    def __init__(self, root):
+
+    def deletar_audiovisual(self):
+
+        codigoum = self.codigo.get()
+    
+        
+        
+        confirmacao = messagebox.askyesno("Confirmação", "Deseja realmente excluir?")
+        if confirmacao:
+            conn = pyodbc.connect('DRIVER={SQL Server};'
+                                  'SERVER=DTI-NBRPE07DXG9\SQLEXPRESS;'
+                                  'DATABASE=audiovisual1;'
+                                  'Trusted_Connection=yes;')
+            cursor = conn.cursor()
+
+        # Insere o registro do filme assistido na tabela correspondente
+            cursor.execute("delete audiovisual where id_audvis = ?",
+                       (codigoum))
+            
+
+            conn.commit()
+            conn.close()
+            messagebox.showinfo("Audiovisual Assistido", "Excluido com sucesso!")
+            self.realizar_consulta()
+            self.limpa_campos()
+            
+
+
+
+#criação da classe audiovisual.
+class Audiovisual(Limps):
+    def __init__(self):
         self.root = root
-        self.consulta_window = tk.Toplevel(root)
-        self.consulta_window.title("Consulta de audiovisual")
+        self.tela()
+        self.criando_objetos()
+        self.lista_audiovisual()
+        self.limpa_campos()
+        root.mainloop()
 
-        # Elementos da interface para consulta
-        label_inicio = tk.Label(self.consulta_window, text="Data de início:")
-        label_inicio.grid(row=0, column=0, padx=10, pady=5)
-        self.entry_inicio = DateEntry(self.consulta_window, width=12, background='darkblue', foreground='white', borderwidth=2)
-        self.entry_inicio.grid(row=0, column=1, padx=10, pady=5)
+#criação da tela    
+    def tela(self):
+        self.root.title("Cadastrar Audiovisual")
+        self.root.configure(background='#EAEAE9')
+        self.root.geometry("1200x600")
+        self.root.resizable(False, False)
 
-        label_fim = tk.Label(self.consulta_window, text="Data de fim:")
-        label_fim.grid(row=1, column=0, padx=10, pady=5)
-        self.entry_fim = DateEntry(self.consulta_window, width=12, background='darkblue', foreground='white', borderwidth=2)
-        self.entry_fim.grid(row=1, column=1, padx=10, pady=5)
+#criação de botões
+    def criando_objetos(self):
+        #botao salvar
+        self.bt_salvar = Button(self.root, text="Salvar", bd=4 , bg='#EAEAE9',fg='#000000', font= ('Times New Roman', 14, 'bold'), command=self.salvar_audiovisual)
+        self.bt_salvar.place(relx=0.75, rely=0.04, relwidth=0.20, relheight=0.05)
 
-        label_nome_filme = tk.Label(self.consulta_window, text="Nome do audiovisual:")
-        label_nome_filme.grid(row=2, column=0, padx=10, pady=5)
-        self.entry_nome_filme = tk.Entry(self.consulta_window)
-        self.entry_nome_filme.grid(row=2, column=1, padx=10, pady=5)
+        #botao Limpar
+        self.bt_limpar = Button(self.root, text="Limpar",bd=4, bg='#EAEAE9', fg='#000000', font= ('Times New Roman', 14, 'bold'), command=self.limpa_campos)
+        self.bt_limpar.place(relx=0.75, rely=0.10, relwidth=0.20, relheight=0.05)
 
-        button_consultar = tk.Button(self.consulta_window, text="Consultar", command=self.realizar_consulta)
-        button_consultar.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky="we")
+
+        #botao alterar
+        self.bt_alterar = Button(self.root, text="Alterar",bd=4, bg='#EAEAE9', fg='green', font= ('Times New Roman', 14, 'bold'), command=self.alterar_audiovisual)
+        self.bt_alterar.place(relx=0.75, rely=0.16, relwidth=0.20, relheight=0.05)
+
+        #botão Deletar
+        self.bt_deletar = Button(self.root, text="Deletar",bd=4, bg='#EAEAE9', fg='red', font= ('Times New Roman', 14, 'bold'), command=self.deletar_audiovisual)
+        self.bt_deletar.place(relx=0.75, rely=0.22, relwidth=0.20, relheight=0.05)
+
+       #botão Pesquisar
+        self.bt_pesquisar = Button(self.root, text="Pesquisa geral",bd=4, bg='#EAEAE9', fg='blue', font= ('Times New Roman', 14, 'bold'), command=self.realizar_consulta)
+        self.bt_pesquisar.place(relx=0.75, rely=0.38, relwidth=0.20, relheight=0.05)
+        
+        #Radiobutom
+        self.rd_filme = Radiobutton(self.root, text="Filme",bd=4, bg='#EAEAE9', fg='Blue', font= ('Times New Roman', 14, 'bold'), command=self.Consulta_filme)
+        self.rd_filme.place(relx=0.50, rely=0.38, relwidth=0.20, relheight=0.05)
+
+        self.rd_serie = Radiobutton(self.root, text="Série",bd=4, bg='#EAEAE9', fg='Blue', font= ('Times New Roman', 14, 'bold'), command=self.Consulta_serie)
+        self.rd_serie.place(relx=0.40, rely=0.38, relwidth=0.15, relheight=0.05)
+
+
+        self.rd_documentario = Radiobutton(self.root, text="Documentário",bd=4, bg='#EAEAE9', fg='Blue', font= ('Times New Roman', 14, 'bold'), command=self.Consulta_documentario)
+        self.rd_documentario.place(relx=0.28, rely=0.38, relwidth=0.15, relheight=0.05)
+
+
+        self.rd_anime = Radiobutton(self.root, text="Animação",bd=4, bg='#EAEAE9', fg='Blue', font= ('Times New Roman', 14, 'bold'), command=self.Consulta_animacao)
+        self.rd_anime.place(relx=0.15, rely=0.38, relwidth=0.15, relheight=0.05)
+
+
         
 
-        self.resultado_texto = tk.Text(self.consulta_window, height=10, width=50)
-        self.resultado_texto.grid(row=4, column=0, columnspan=2, padx=10, pady=5)
+        #criando label e caixa de texto.
+        self.lb_nome = Label(self.root, text="Nome da produção",bg='#EAEAE9', fg='#000000', font= ('Arial', 12, 'bold'))
+        self.lb_nome.place(relx=0.0100, rely=0.03, relwidth=0.13, relheight=0.05)
+    
+
+        self.nomeprod = Entry(self.root)
+        self.nomeprod.place(relx=0.2, rely=0.03, relwidth=0.25, relheight=0.04)
+
+        #Genero
+        self.lb_genero = Label(self.root, text="Gênero", bg='#EAEAE9',fg='#000000', font= ('Arial', 12, 'bold'))
+        self.lb_genero.place(relx=0.00, rely=0.09, relwidth=0.10, relheight=0.05)
+        
+
+        generos = ["Ação", "Comédia", "Drama", "Romance", "Ficção Científica", "Terror","Documentário","Espionagem","Fantasia","Filme de guerra","Musical","Filme policial"]
+        self.combo_genero = ttk.Combobox(root, values= generos)
+        self.combo_genero.place(relx=0.20, rely=0.09, relwidth=0.10, relheight=0.05)
+
+        #Tipo de produção
+        self.lb_tipo = Label(self.root, text="Tipo de produção", bg='#EAEAE9',fg='#000000', font= ('Arial', 12, 'bold'))
+        self.lb_tipo.place(relx=0.0, rely=0.15, relwidth=0.14, relheight=0.05)
+       
+
+        tipopro = ["Filme", "Série", "Documentário","Animação"]
+        self.combo_tipo = ttk.Combobox(root, values= tipopro)
+        self.combo_tipo.place(relx=0.20, rely=0.15, relwidth=0.08, relheight=0.05)
+
+        #Data assistida
+        self.lb_calendario = Label(self.root, text="Data assistida", bg='#EAEAE9',fg='#000000', font= ('Arial', 12, 'bold'))
+        self.lb_calendario.place(relx=0.01, rely=0.22, relwidth=0.10, relheight=0.05)
+        
+
+        
+        self.datassis = DateEntry(root, width=12, background='darkblue', foreground='white', borderwidth=2)
+        self.datassis.place(relx=0.20, rely=0.22, relwidth=0.08, relheight=0.05)
 
 
-        self.tree = ttk.Treeview(self.consulta_window)
-        self.tree["columns"] = ("Nome", "Gênero", "Produção", "Data Assistido")
-        self.tree.grid(row=4, column=0, columnspan=2, padx=8, pady=5)
-        self.tree.heading("#0", text="")
-        self.tree.column("#0", width=0, stretch=tk.NO)
-        self.tree.heading("Nome", text="Nome")
-        self.tree.heading("Gênero", text="Gênero")
-        self.tree.heading("Data Assistido", text="Data Assistido")
-        self.tree.heading("Produção", text="Produção")
+
+        self.lb_nome = Label(self.root, text="Código",bg='#EAEAE9', fg='#000000', font= ('Arial', 12, 'bold'))
+        self.lb_nome.place(relx=0.01, rely=0.35, relwidth=0.13, relheight=0.05)
+        self.codigo = Entry(self.root)
+        self.codigo.place(relx=0.045, rely=0.40, relwidth=0.05, relheight=0.03)
+
+
+  
+    
+    
+
+    
+
+
+    def lista_audiovisual(self):
+        self.listaudi = ttk.Treeview(self.root, height= 3, columns=("col1", "col2", "col3", "col4","col5"))
+        self.listaudi.heading("#0", text="")
+        self.listaudi.heading("#1", text="Código")
+        self.listaudi.heading("#2", text="Nome")
+        self.listaudi.heading("#3", text="Gênero")
+        self.listaudi.heading("#4", text="Produção")
+        self.listaudi.heading("#5", text="Data Assistida")
+
+        self.listaudi.column("#0", width=1)
+        self.listaudi.column("#1", width=50)
+        self.listaudi.column("#2", width=200)
+        self.listaudi.column("#3", width=125)
+        self.listaudi.column("#4", width=125)
+        self.listaudi.column("#5", width=125)
+
+
+        self.listaudi.place(relx=0.01, rely=0.45, relwidth=0.97, relheight=0.54)
+
+
+        self.scroolistaudi =Scrollbar(self.root, orient='vertical')
+        self.listaudi.configure(yscroll=self.scroolistaudi.set)
+        self.scroolistaudi.place(relx=0.96, rely=0.45, relwidth=0.04,relheight=0.54)
+        self.listaudi.bind("<Double-1>", self.ondoubleClick)
 
 
     def formatar_data(self, data):
@@ -142,10 +260,10 @@ class ConsultaFilmesApp:
         return data_datetime.strftime('%d/%m/%Y')
 
 
+
     def realizar_consulta(self):
-        data_inicio = self.entry_inicio.get_date().strftime('%Y-%m-%d')
-        data_fim = self.entry_fim.get_date().strftime('%Y-%m-%d')
-        #nome_audio = self.entry_nome_filme.get()
+        
+
 
         conn = pyodbc.connect('DRIVER={SQL Server};'
                             'SERVER=DTI-NBRPE07DXG9\SQLEXPRESS;'
@@ -155,177 +273,165 @@ class ConsultaFilmesApp:
         
 
         if id_login:
-            cursor.execute("SELECT nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual WHERE data_assis BETWEEN ? AND ? AND id_usuario=?",
-                           (data_inicio, data_fim, id_login))
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual")
             
         else:
-            cursor.execute("SELECT nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual WHERE AND data_assis BETWEEN ? AND ? AND id_usuario=?",
-                           (id_login, data_inicio, data_fim))
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual")
 
         resultados = cursor.fetchall()
 
-        self.tree.delete(*self.tree.get_children())
+        self.listaudi.delete(*self.listaudi.get_children())
 
 
         for resultado in resultados:
-            data_formatada = self.formatar_data(resultado[3])
-            self.tree.insert("", "end", values=(resultado[0], resultado[1], resultado[2], data_formatada))
+            data_formatada = self.formatar_data(resultado[4])
+            self.listaudi.insert("", "end", values=(resultado[0], resultado[1], resultado[2], resultado[3], data_formatada))
 
         cursor.close()
         conn.close()
 
 
+    def Consulta_filme(self):
+       
 
-class LoginApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Sistema de Login")
 
-        # Criando os rótulos e campos de entrada para login
-        label_username = tk.Label(root, text="Usuário:")
-        label_username.grid(row=0, column=0, padx=10, pady=10)
-        self.entry_username = tk.Entry(root)
-        self.entry_username.grid(row=0, column=1, padx=10, pady=5)
-
-        label_password = tk.Label(root, text="Senha:")
-        label_password.grid(row=1, column=0, padx=10, pady=5)
-        self.entry_password = tk.Entry(root, show="*")
-        self.entry_password.grid(row=1, column=1, padx=10, pady=5)
-
-        # Definindo os botões para login, cadastro e alterar senha
-        button_login = tk.Button(root, text="Login", command=self.login)
-        button_login.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="WE")
-
-        button_cadastrar = tk.Button(root, text="Cadastrar", command=self.cadastrar)
-        button_cadastrar.grid(row=3, column=0, columnspan=3, padx=5, pady=10, sticky="WE")
-
-        button_alterar_senha = tk.Button(root, text="Alterar Senha", command=self.alterar_senha)
-        button_alterar_senha.grid(row=4, column=0, columnspan=3, padx=5, pady=10, sticky="WE")
-
-    def login(self):
-        username = self.entry_username.get()
-        password = self.entry_password.get()
-
-        # Conecta-se ao banco de dados
         conn = pyodbc.connect('DRIVER={SQL Server};'
-                              'SERVER=DTI-NBRPE07DXG9\SQLEXPRESS;'
-                              'DATABASE=audiovisual1;'
-                              'Trusted_Connection=yes;')
+                            'SERVER=DTI-NBRPE07DXG9\SQLEXPRESS;'
+                            'DATABASE=audiovisual1;'
+                            'Trusted_Connection=yes;')
+        cursor = conn.cursor()
         
 
-        cursor = conn.cursor()
-
-        # Consulta o banco de dados para verificar se o usuário e a senha estão corretos
-        cursor.execute("SELECT id_login FROM loginn WHERE usuario = ? COLLATE SQL_Latin1_General_CP1_CS_AS and senha = ? COLLATE SQL_Latin1_General_CP1_CS_AS", (username, password))
-        row = cursor.fetchone()
-
-        if row:
-            global id_login
-            id_login = row[0]  # Obtém o UserID do resultado da consulta
-            cursor.close()  # Fecha o cursor
-            conn.close()    # Fecha a conexão com o banco de dados
-            self.root.withdraw()  # Esconde a janela de login
-            self.filmes_app = FilmesApp(tk.Toplevel(self.root))  # Mantém uma referência à instância de FilmesApp
-
+        if id_login:
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Filme"))
+            
         else:
-            messagebox.showerror("Login", "Usuário ou senha incorretos.")
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Filme"))
 
-            cursor.close()  # Fecha o cursor
-            conn.close()    # Fecha a conexão com o banco de dados
+        resultados = cursor.fetchall()
 
-    def cadastrar(self):
-        # Abre uma nova janela para cadastro
-        cadastro_window = tk.Toplevel(self.root)
-        cadastro_window.title("Cadastro de Usuário")
-
-        label_username = tk.Label(cadastro_window, text="Usuário:")
-        label_username.grid(row=0, column=0, padx=10, pady=5)
-        entry_new_username = tk.Entry(cadastro_window)
-        entry_new_username.grid(row=0, column=1, padx=10, pady=5)
-
-        label_password = tk.Label(cadastro_window, text="Senha:")
-        label_password.grid(row=1, column=0, padx=10, pady=5)
-        entry_new_password = tk.Entry(cadastro_window, show="*")
-        entry_new_password.grid(row=1, column=1, padx=10, pady=5)
-
-        def salvar_cadastro():
-            new_username = entry_new_username.get()
-            new_password = entry_new_password.get()
-
-            # Conecta-se ao banco de dados
-            conn = pyodbc.connect('DRIVER={SQL Server};'
-                                  'SERVER=DTI-NBRPE07DXG9\SQLEXPRESS;'
-                                  'DATABASE=audiovisual1;'
-                                  'Trusted_Connection=yes;')
-            print("conexao realizada")
-
-            cursor = conn.cursor()
-
-            # Verifica se o usuário já existe
-            cursor.execute("SELECT * FROM loginn WHERE usuario=? COLLATE SQL_Latin1_General_CP1_CS_AS", (new_username,))
-            if cursor.fetchone():
-                messagebox.showerror("Cadastro", "Este usuário já existe.")
-            else:
-                # Insere o novo usuário no banco de dados
-                cursor.execute("INSERT INTO loginn (usuario, senha) VALUES (?, ?)", (new_username, new_password))
-                conn.commit()
-                messagebox.showinfo("Cadastro", "Usuário cadastrado com sucesso!")
-                cadastro_window.destroy()
-
-            cursor.close()  # Fecha o cursor
-            conn.close()    # Fecha a conexão com o banco de dados
-
-        button_salvar_cadastro = tk.Button(cadastro_window, text="Salvar", command=salvar_cadastro)
-        button_salvar_cadastro.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="WE")
-
-    def alterar_senha(self):
-        # Abre uma nova janela para alterar a senha
-        alterar_senha_window = tk.Toplevel(self.root)
-        alterar_senha_window.title("Alterar Senha")
-
-        label_username = tk.Label(alterar_senha_window, text="Usuário:")
-        label_username.grid(row=0, column=0, padx=10, pady=5)
-        entry_username = tk.Entry(alterar_senha_window)
-        entry_username.grid(row=0, column=1, padx=10, pady=5)
-
-        label_password = tk.Label(alterar_senha_window, text="Nova Senha:")
-        label_password.grid(row=1, column=0, padx=10, pady=5)
-        entry_new_password = tk.Entry(alterar_senha_window, show="*")
-        entry_new_password.grid(row=1, column=1, padx=10, pady=5)
-
-        def salvar_alteracao_senha():
-            username = entry_username.get()
-            new_password = entry_new_password.get()
-
-            # Conecta-se ao banco de dados
-            conn = pyodbc.connect('DRIVER={SQL Server};'
-                                  'SERVER=DTI-NBRPE07DXG9\SQLEXPRESS;'
-                                  'DATABASE=audiovisual1;'
-                                  'Trusted_Connection=yes;')
-
-            cursor = conn.cursor()
-
-            # Verifica se o usuário existe
-            cursor.execute("SELECT * FROM loginn WHERE usuario=?", (username,))
-            if cursor.fetchone():
-                # Atualiza a senha do usuário
-                cursor.execute("UPDATE loginn SET senha=? WHERE usuario=?", (new_password, username))
-                conn.commit()
-                messagebox.showinfo("Alterar Senha", "Senha alterada com sucesso!")
-                alterar_senha_window.destroy()
-            else:
-                messagebox.showerror("Alterar Senha", "Usuário não encontrado.")
-
-            cursor.close()  # Fecha o cursor
-            conn.close()    # Fecha a conexão com o banco de dados
-
-        button_salvar_alteracao_senha = tk.Button(alterar_senha_window, text="Salvar", command=salvar_alteracao_senha)
-        button_salvar_alteracao_senha.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="WE")
+        self.listaudi.delete(*self.listaudi.get_children())
 
 
-root = tk.Tk()
-app = LoginApp(root)
-root.mainloop()
+        for resultado in resultados:
+            data_formatada = self.formatar_data(resultado[4])
+            self.listaudi.insert("", "end", values=(resultado[0], resultado[1], resultado[2], resultado[3], data_formatada))
+
+        cursor.close()
+        conn.close()
+
+
+    def Consulta_serie(self):
+       
+
+
+        conn = pyodbc.connect('DRIVER={SQL Server};'
+                            'SERVER=DTI-NBRPE07DXG9\SQLEXPRESS;'
+                            'DATABASE=audiovisual1;'
+                            'Trusted_Connection=yes;')
+        cursor = conn.cursor()
+        
+
+        if id_login:
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Série"))
+            
+        else:
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Série"))
+
+        resultados = cursor.fetchall()
+
+        self.listaudi.delete(*self.listaudi.get_children())
+
+
+        for resultado in resultados:
+            data_formatada = self.formatar_data(resultado[4])
+            self.listaudi.insert("", "end", values=(resultado[0], resultado[1], resultado[2], resultado[3], data_formatada))
+
+        cursor.close()
+        conn.close()
+
+
+    def Consulta_documentario(self):
+       
+
+
+        conn = pyodbc.connect('DRIVER={SQL Server};'
+                            'SERVER=DTI-NBRPE07DXG9\SQLEXPRESS;'
+                            'DATABASE=audiovisual1;'
+                            'Trusted_Connection=yes;')
+        cursor = conn.cursor()
+        
+
+        if id_login:
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Documentário"))
+            
+        else:
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Documentário"))
+
+        resultados = cursor.fetchall()
+
+        self.listaudi.delete(*self.listaudi.get_children())
+
+
+        for resultado in resultados:
+            data_formatada = self.formatar_data(resultado[4])
+            self.listaudi.insert("", "end", values=(resultado[0], resultado[1], resultado[2], resultado[3], data_formatada))
+
+        cursor.close()
+        conn.close()
+
+
+    def Consulta_animacao(self):
+       
+
+
+        conn = pyodbc.connect('DRIVER={SQL Server};'
+                            'SERVER=DTI-NBRPE07DXG9\SQLEXPRESS;'
+                            'DATABASE=audiovisual1;'
+                            'Trusted_Connection=yes;')
+        cursor = conn.cursor()
+        
+
+        if id_login:
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Animação"))
+            
+        else:
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Animação"))
+
+        resultados = cursor.fetchall()
+
+        self.listaudi.delete(*self.listaudi.get_children())
+
+
+        for resultado in resultados:
+            data_formatada = self.formatar_data(resultado[4])
+            self.listaudi.insert("", "end", values=(resultado[0], resultado[1], resultado[2], resultado[3], data_formatada))
+
+        cursor.close()
+        conn.close()
+
+
+    def ondoubleClick(self, event):
+        self.limpa_campos()
+        self.listaudi.selection()
+
+        for n in self.listaudi.selection():
+            col1, col2, col3, col4, col5 = self.listaudi.item(n, 'values')
+            self.codigo.insert(END, col1)
+            self.nomeprod.insert(END, col2)
+            self.combo_genero.insert(END, col4)
+            self.combo_tipo.insert(END, col3)
+            self.datassis.insert(END, col5)
+
+            
+
+
+
+
+
+
+Audiovisual()
+
 
 
 
