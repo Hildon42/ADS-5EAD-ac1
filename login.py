@@ -56,10 +56,13 @@ class LoginApp:
         if row:
             global id_login
             id_login = row[0]  # Obtém o UserID do resultado da consulta
+            cursor = conn.cursor()
+            cursor.execute("UPDATE atual SET id_atual=?", (id_login))
+            conn.commit()
             cursor.close()  # Fecha o cursor
             conn.close()    # Fecha a conexão com o banco de dados
             self.root.withdraw()  # Esconde a janela de login
-            import audiovisual 
+            import main
             
         else:
             messagebox.showerror("Login", "Usuário ou senha incorretos.")

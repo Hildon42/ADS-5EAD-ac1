@@ -3,12 +3,16 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 import pyodbc
+import customtkinter as ctk
 from tkcalendar import DateEntry
 import datetime
 
-global id_login
 
-id_login = 1
+
+
+
+
+
 
 
 root = Tk()
@@ -20,6 +24,14 @@ class Limps():
         self.combo_tipo.delete(0, END)
         self.codigo.delete(0, END)
         self.datassis.delete(0, END)
+
+
+
+        
+
+
+
+        
 
 
     def salvar_audiovisual(self):
@@ -122,9 +134,10 @@ class Limps():
 
 #criação da classe audiovisual.
 class Audiovisual(Limps):
-    def __init__(self):
+    def __init__(self):      
         self.root = root
         self.tela()
+        self.login()
         self.criando_objetos()
         self.lista_audiovisual()
         self.limpa_campos()
@@ -132,7 +145,7 @@ class Audiovisual(Limps):
 
 #criação da tela    
     def tela(self):
-        self.root.title("Cadastrar Audiovisual")
+        self.root.title("Gerenciar Audiovisual")
         self.root.configure(background='#EAEAE9')
         self.root.geometry("1200x600")
         self.root.resizable(False, False)
@@ -158,7 +171,7 @@ class Audiovisual(Limps):
 
        #botão Pesquisar
         self.bt_pesquisar = Button(self.root, text="Pesquisa geral",bd=4, bg='#EAEAE9', fg='blue', font= ('Times New Roman', 14, 'bold'), command=self.realizar_consulta)
-        self.bt_pesquisar.place(relx=0.75, rely=0.38, relwidth=0.20, relheight=0.05)
+        self.bt_pesquisar.place(relx=0.75, rely=0.28, relwidth=0.20, relheight=0.05)
         
         #Radiobutom
         self.rd_filme = Radiobutton(self.root, text="Filme",bd=4, bg='#EAEAE9', fg='Blue', font= ('Times New Roman', 14, 'bold'), command=self.Consulta_filme)
@@ -191,7 +204,7 @@ class Audiovisual(Limps):
         self.lb_genero.place(relx=0.00, rely=0.09, relwidth=0.10, relheight=0.05)
         
 
-        generos = ["Ação", "Comédia", "Drama", "Romance", "Ficção Científica", "Terror","Documentário","Espionagem","Fantasia","Filme de guerra","Musical","Filme policial"]
+        generos = ["Ação", "Comédia", "Drama", "Romance", "Ficção Científica", "Terror","Reality","Documentário","Espionagem","Fantasia","Filme de guerra","Musical","Filme policial"]
         self.combo_genero = ttk.Combobox(root, values= generos)
         self.combo_genero.place(relx=0.20, rely=0.09, relwidth=0.10, relheight=0.05)
 
@@ -273,10 +286,10 @@ class Audiovisual(Limps):
         
 
         if id_login:
-            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual")
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where id_usuario =?", id_login)
             
         else:
-            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual")
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where id_usuario =?", id_login)
 
         resultados = cursor.fetchall()
 
@@ -303,10 +316,10 @@ class Audiovisual(Limps):
         
 
         if id_login:
-            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Filme"))
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ? and audiovisual.id_usuario = ?", ("Filme", id_login))
             
         else:
-            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Filme"))
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ? and audiovisual.id_usuario = ?", ("Filme", id_login))
 
         resultados = cursor.fetchall()
 
@@ -333,10 +346,10 @@ class Audiovisual(Limps):
         
 
         if id_login:
-            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Série"))
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ? and audiovisual.id_usuario = ?", ("Série",id_login))
             
         else:
-            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Série"))
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ? and audiovisual.id_usuario = ?", ("Série",id_login))
 
         resultados = cursor.fetchall()
 
@@ -363,10 +376,10 @@ class Audiovisual(Limps):
         
 
         if id_login:
-            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Documentário"))
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?  and id_usuario = ?", ("Documentário", id_login))
             
         else:
-            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Documentário"))
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ? and id_usuario = ?", ("Documentário", id_login))
 
         resultados = cursor.fetchall()
 
@@ -393,10 +406,10 @@ class Audiovisual(Limps):
         
 
         if id_login:
-            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Animação"))
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ? and audiovisual.id_usuario = ?", ("Animação", id_login))
             
         else:
-            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ?", ("Animação"))
+            cursor.execute("SELECT id_audvis, nomeaudivisual, nome_tipoproduc, nome_gen, data_assis FROM audiovisual where audiovisual.nome_tipoproduc = ? and audiovisual.id_usuario = ?", ("Animação", id_login))
 
         resultados = cursor.fetchall()
 
@@ -423,12 +436,33 @@ class Audiovisual(Limps):
             self.combo_tipo.insert(END, col3)
             self.datassis.insert(END, col5)
 
-            
+
+
+    def login(self):
+    
+
+        # Conecta-se ao banco de dados
+        conn = pyodbc.connect('DRIVER={SQL Server};'
+                              'SERVER=DTI-NBRPE07DXG9\SQLEXPRESS;'
+                              'DATABASE=audiovisual1;'
+                              'Trusted_Connection=yes;')
+        
+
+        cursor = conn.cursor()
+
+        # Consulta o banco de dados para verificar se o usuário e a senha estão corretos
+        cursor.execute("SELECT id_atual FROM atual")
+        row = cursor.fetchone()
+
+        if row:
+            global id_login
+            id_login = row[0]  # Obtém o UserID do resultado da consulta
+            cursor.close()  # Fecha o cursor
+            conn.close()
 
 
 
-
-
+        
 
 Audiovisual()
 
